@@ -13,6 +13,10 @@ const LogoContainer = styled.div`
   top: 0;
   left: 0;
 
+  img{
+    width: 250px;
+  }
+
   @media screen and (max-width: 650px){
     img{
       width: 230px;

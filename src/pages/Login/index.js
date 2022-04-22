@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { fireAlert, fireToast } from '../../utils/alerts';
+import useApi from '../../hooks/useApi';
 import Logo from '../../assets/img/logo.svg';
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
@@ -22,6 +24,7 @@ import {
 } from '../../components/Form';
 
 export default function Login() {
+  const [email, setEmail] = useState('');
   const [values, setValues] = useState({
     amount: '',
     password: '',
@@ -29,6 +32,29 @@ export default function Login() {
     weightRange: '',
     showPassword: false,
   });
+  const navigate = useNavigate();
+  const api = useApi();
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    if (!values.password || !email)
+      return fireAlert("Existem campos vazios! Reveja e tente novamente!");
+
+    try {
+      const { data } = await api.auth.login({ email, password: values.password });
+      console.log(data);
+
+      fireToast('success', 'Login realizado com sucesso!');
+      navigate('/courses');
+    } catch (error) {
+      if (error.response.status === 401) {
+        fireAlert("Email ou senha incorretos! Tente novamente!");
+      } else {
+        fireAlert(error.response.data);
+      }
+    }
+  }
 
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
@@ -104,12 +130,15 @@ export default function Login() {
 
           <CustomizedDivider>ou</CustomizedDivider>
 
-          <Form>
+          <Form onSubmit={handleSubmit}>
             <TextField
               sx={{ width: '100%' }}
               id="outlined-basic"
               label="Email"
               variant="outlined"
+              type={'email'}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
 
             <FormControl sx={{ width: '100%' }} variant="outlined">
@@ -140,7 +169,7 @@ export default function Login() {
                 {'Não possuo cadastro'}
               </CustomizedLink>
 
-              <Button variant="contained">ENTRAR</Button>
+              <Button type="submit" variant="contained">ENTRAR</Button>
             </FormFooter>
           </Form>
         </div>

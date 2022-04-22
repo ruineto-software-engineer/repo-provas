@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { fireAlert, fireToast } from '../../utils/alerts';
+import useApi from '../../hooks/useApi';
 import Logo from '../../assets/img/logo.svg';
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
@@ -12,16 +14,17 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button';
 import { styled } from '@mui/system';
-import { 
-  Container, 
-  Content, 
-  Form, 
-  FormFooter, 
-  TitlePage, 
-  LogoContainer 
+import {
+  Container,
+  Content,
+  Form,
+  FormFooter,
+  TitlePage,
+  LogoContainer
 } from '../../components/Form';
 
 export default function Register() {
+  const [email, setEmail] = useState('');
   const [values, setValues] = useState({
     amount: '',
     password: '',
@@ -36,6 +39,31 @@ export default function Register() {
     weightRange: '',
     showPassword: false,
   });
+  const navigate = useNavigate();
+  const api = useApi();
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    if (!values.password || !confirm.password || !email)
+      return fireAlert("Existem campos vazios! Reveja e tente novamente!");
+
+    if (values.password !== confirm.password)
+      return fireAlert("As senhas não coincidem! Tente novamente!");
+
+    try {
+      await api.user.register({ email, password: values.password });
+
+      fireToast('success', 'Cadastro realizado com sucesso!');
+      navigate('/');
+    } catch (error) {
+      if (error.response.status === 409) {
+        fireAlert("O email já está em uso! Tente novamente!");
+      } else {
+        fireAlert(error.response.data);
+      }
+    }
+  }
 
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
@@ -123,12 +151,15 @@ export default function Register() {
 
           <CustomizedDivider>ou</CustomizedDivider>
 
-          <Form>
+          <Form onSubmit={handleSubmit}>
             <TextField
               sx={{ width: '100%' }}
               id="outlined-basic"
               label="Email"
               variant="outlined"
+              type={'email'}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
 
             <FormControl sx={{ width: '100%' }} variant="outlined">
@@ -182,7 +213,7 @@ export default function Register() {
                 {'Já possuo cadastro'}
               </CustomizedLink>
 
-              <Button variant="contained">CADASTRAR</Button>
+              <Button type="submit" variant="contained">CADASTRAR</Button>
             </FormFooter>
           </Form>
         </div>
