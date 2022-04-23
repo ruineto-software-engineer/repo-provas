@@ -16,6 +16,7 @@ export async function fireConfirm() {
     cancelButtonColor: "#d33",
     confirmButtonText: "Yes",
   })
+
   return res
 }
 

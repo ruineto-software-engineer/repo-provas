@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fireAlert, fireToast } from '../../utils/alerts';
 import useApi from '../../hooks/useApi';
+import useAuth from '../../hooks/useAuth';
 import Logo from '../../assets/img/logo.svg';
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
@@ -33,7 +34,12 @@ export default function Login() {
     showPassword: false,
   });
   const navigate = useNavigate();
+  const { login } = useAuth();
   const api = useApi();
+
+  useEffect(() => {
+    if (localStorage.getItem("auth") !== null) navigate('/courses');
+  }, [navigate]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -46,6 +52,7 @@ export default function Login() {
       console.log(data);
 
       fireToast('success', 'Login realizado com sucesso!');
+      login(data);
       navigate('/courses');
     } catch (error) {
       if (error.response.status === 401) {
