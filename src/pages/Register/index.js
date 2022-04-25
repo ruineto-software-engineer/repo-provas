@@ -186,9 +186,9 @@ export default function Register() {
             </FormControl>
 
             <FormControl sx={{ width: '100%' }} variant="outlined">
-              <InputLabel htmlFor="outlined-adornment-password">Confirme sua senha</InputLabel>
+              <InputLabel htmlFor="outlined-adornment-confirm-password">Confirme sua senha</InputLabel>
               <OutlinedInput
-                id="outlined-adornment-password"
+                id="outlined-adornment-confirm-password"
                 type={confirm.showPassword ? 'text' : 'password'}
                 value={confirm.password}
                 onChange={handleChangeConfirm('password')}
