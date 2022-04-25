@@ -123,10 +123,14 @@ export default function Instructors() {
         </AccordionSummary>
         <AccordionDetails>
           {instructor.categories.map((category) => {
+            const displayP = category.tests.filter((test) => (
+              test.teacherTests.length > 0
+            ));
+
             return (
               <CustomizedP
                 key={category.categoryName}
-                displayP={category.tests[0].teacherTests.length}
+                displayP={displayP.length}
               >
                 {category.categoryName}
                 <br />
