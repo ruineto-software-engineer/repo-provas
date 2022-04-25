@@ -46,12 +46,21 @@ export default function Header() {
 
       <TextFieldContainer>
         <TextFieldContent>
-          <TextField
-            sx={{ width: '100%' }}
-            id="outlined-basic-header"
-            label="Pesquise por disciplina"
-            variant="outlined"
-          />
+          {location.pathname === '/courses' ?
+            <TextField
+              sx={{ width: '100%' }}
+              id="outlined-basic-header-courses"
+              label="Pesquise por disciplina"
+              variant="outlined"
+            />
+            :
+            <TextField
+              sx={{ width: '100%' }}
+              id="outlined-basic-header-instructors"
+              label="Pesquise por pessoa instrutora"
+              variant="outlined"
+            />
+          }
         </TextFieldContent>
       </TextFieldContainer>
     </Container>

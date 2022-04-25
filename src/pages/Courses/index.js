@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { fireAlert } from "../../utils/alerts";
 import useAuth from "../../hooks/useAuth";
@@ -17,9 +17,11 @@ import {
   CustomizedLink,
   AcordeonContainer
 } from "./style";
+import styled from "styled-components";
 
 export default function Courses() {
   const [disciplines, setDisciplines] = useState(null);
+  const [categories, setCategories] = useState(null);
   const { auth, logout } = useAuth();
   const navigate = useNavigate();
   const api = useApi();
@@ -40,8 +42,10 @@ export default function Courses() {
 
     try {
       const { data } = await api.courses.getDisciplines(headers);
-
       setDisciplines(data);
+
+      const categoriesPromise = await api.instructors.getCategories(headers);
+      setCategories(categoriesPromise.data);
     } catch (error) {
       if (error.response.status === 401) {
         Swal.fire({
@@ -74,57 +78,89 @@ export default function Courses() {
     }
   }
 
-  if (!disciplines) return "Carregando...";
+  if (!disciplines || !categories) return "Carregando...";
 
-  const disciplinesReader = disciplines.map((course) => {
+  const data = disciplines.map((term) => {
+    return {
+      term: term.number,
+      disciplines: term.discipline.map((discipline) => {
+        return {
+          disciplineName: discipline.name,
+          disciplineCategory: categories.map((category) => {
+            return {
+              categoryName: category.name,
+              tests: discipline.teachersDisciplines.map((teacherDiscipline) => {
+                const teacherName = teacherDiscipline.teacher.name;
+
+                return {
+                  teacherTests: teacherDiscipline.test.filter((test) => test.categoryId === category.id).map(element => {
+                    return {
+                      ...element,
+                      teacherName
+                    }
+                  })
+                }
+              })
+            }
+          })
+        }
+      })
+    };
+  });
+
+  const disciplinesReader = data.map((course) => {
     return (
       <Accordion
-        key={course.id}
-        expanded={expanded === `panel${course.id}`}
-        onChange={handleChange(`panel${course.id}`)}
+        key={course.term}
+        expanded={expanded === `panel${course.term}`}
+        onChange={handleChange(`panel${course.term}`)}
       >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
-          aria-controls={`panel${course.id}bh-content`}
-          id={`panel${course.id}bh-header`}
+          aria-controls={`panel${course.term}bh-content`}
+          id={`panel${course.term}bh-header`}
         >
           <Typography sx={{ width: '33%', flexShrink: 0 }}>
-            {`${course.number}º Período`}
+            {`${course.term}º Período`}
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-          {course.discipline.map((discipline) => {
+          {course.disciplines.map((discipline) => {
             return (
-              <Accordion key={discipline.id}>
+              <Accordion key={discipline.disciplineName}>
                 <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel1a-content"
                   id="panel1a-header"
                 >
-                  <Typography>{discipline.name}</Typography>
+                  <Typography>{discipline.disciplineName}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  {discipline.teachersDisciplines.map((teacherDiscipline) => {
-                    const teacherName = teacherDiscipline.teacher.name;
-
+                  {discipline.disciplineCategory.map((category) => {
                     return (
-                      <div key={teacherDiscipline.id}>
-                        {
-                          teacherDiscipline.test.map((exam) => {
-                            return (
-                              <div key={exam.id}>
-                                <p>{exam.category.name}</p>
-                                <a
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  href={exam.pdfUrl}
-                                >
-                                  {`${exam.name} (${teacherName})`}
-                                </a>
-                              </div>
-                            );
-                          })
-                        }
+                      <div key={category.categoryName}>
+                        <CustomizedP displayP={category.tests[0].teacherTests.length}>
+                          {category.categoryName}
+                          <br />
+
+                          {category.tests.map(test => (
+                            test.teacherTests.map((teacherTest) => {
+                              return (
+                                <Fragment key={teacherTest.categoryId}>
+                                  <span>
+                                    <a
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      href={teacherTest.pdfUrl}
+                                    >
+                                      {`${teacherTest.name} (${teacherTest.teacherName})`}
+                                    </a>
+                                  </span><br />
+                                </Fragment>
+                              );
+                            })
+                          ))}
+                        </CustomizedP>
                       </div>
                     );
                   })}
@@ -159,3 +195,7 @@ export default function Courses() {
     </Container>
   );
 }
+
+const CustomizedP = styled.p`
+  display: ${(props) => props.displayP === 0 && 'none'}
+`;
