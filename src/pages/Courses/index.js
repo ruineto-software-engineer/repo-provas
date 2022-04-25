@@ -108,6 +108,8 @@ export default function Courses() {
     };
   });
 
+  console.log(data);
+
   const disciplinesReader = data.map((course) => {
     return (
       <Accordion
@@ -137,9 +139,13 @@ export default function Courses() {
                 </AccordionSummary>
                 <AccordionDetails>
                   {discipline.disciplineCategory.map((category) => {
+                    const displayP = category.tests.filter((test) => (
+                      test.teacherTests.length > 0
+                    ));
+
                     return (
                       <div key={category.categoryName}>
-                        <CustomizedP displayP={category.tests[0].teacherTests.length}>
+                        <CustomizedP displayP={displayP.length}>
                           {category.categoryName}
                           <br />
 
