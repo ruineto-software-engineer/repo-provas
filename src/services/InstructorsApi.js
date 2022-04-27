@@ -8,4 +8,8 @@ export default class InstructorsApi {
   getCategories(headers) {
     return api.get("/instructors/categories", headers);
   }
+
+  getInstructorsByName(instructorName, headers){
+    return api.get(`/instructors/${instructorName}`, headers);
+  }
 }

@@ -60,11 +60,22 @@ const TextFieldContent = styled.div`
   align-items: center;
 `;
 
+const TitleTestPage = styled.h2`
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 24px;
+
+  color: rgba(0, 0, 0, 0.8);
+`;
+
 export {
   Container,
   ActionContainer,
   LogoContainer,
   LogoutContainer,
   TextFieldContainer,
-  TextFieldContent
+  TextFieldContent,
+  TitleTestPage
 };

@@ -48,11 +48,16 @@ const CustomizedLink = styled(Link)`
   text-decoration: none;
 `;
 
+const CustomizedP = styled.p`
+  display: ${(props) => props.displayP === 0 && 'none'};
+`;
+
 export {
   Container,
   Content,
   NavSection,
   CustomizedLink,
-  AcordeonContainer
+  AcordeonContainer,
+  CustomizedP
 }
 

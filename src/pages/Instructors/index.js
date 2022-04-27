@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { fireAlert } from "../../utils/alerts";
 import useAuth from "../../hooks/useAuth";
 import useApi from "../../hooks/useApi";
+import useInstructors from "../../hooks/useInstructors";
 import Button from '@mui/material/Button';
 import Swal from "sweetalert2";
 import Accordion from '@mui/material/Accordion';
@@ -15,14 +16,14 @@ import {
   Content,
   NavSection,
   CustomizedLink,
-  AcordeonContainer
+  AcordeonContainer,
+  CustomizedP
 } from "./style";
-import styled from "styled-components";
 
 export default function Instructors() {
-  const [instructors, setInstructors] = useState(null);
   const [categories, setCategories] = useState(null);
   const { auth, logout } = useAuth();
+  const { instructors, setInstructors } = useInstructors();
   const navigate = useNavigate();
   const api = useApi();
 
@@ -50,7 +51,7 @@ export default function Instructors() {
       if (error.response.status === 401) {
         Swal.fire({
           title: 'Oops...',
-          text: "Your session expired, login again to access!",
+          text: "Sua sessão expirou, faça login novamente para acessar!",
           icon: 'error',
           confirmButtonColor: '#3085d6',
           confirmButtonText: 'Ok'
@@ -101,9 +102,7 @@ export default function Instructors() {
         }
       })
     });
-  })
-
-  console.log(data);
+  });
 
   const instructorsReader = data.map((instructor) => {
     return (
@@ -182,7 +181,3 @@ export default function Instructors() {
     </Container>
   );
 }
-
-const CustomizedP = styled.p`
-  display: ${(props) => props.displayP === 0 && 'none'}
-`;

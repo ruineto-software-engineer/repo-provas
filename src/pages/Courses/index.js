@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { fireAlert } from "../../utils/alerts";
 import useAuth from "../../hooks/useAuth";
 import useApi from "../../hooks/useApi";
+import useDisciplines from "../../hooks/useDisciplines";
 import Button from '@mui/material/Button';
 import Swal from "sweetalert2";
 import Accordion from '@mui/material/Accordion';
@@ -15,14 +16,14 @@ import {
   Content,
   NavSection,
   CustomizedLink,
-  AcordeonContainer
+  AcordeonContainer,
+  CustomizedP
 } from "./style";
-import styled from "styled-components";
 
 export default function Courses() {
-  const [disciplines, setDisciplines] = useState(null);
-  const [categories, setCategories] = useState(null);
   const { auth, logout } = useAuth();
+  const { disciplines, setDisciplines } = useDisciplines();
+  const [categories, setCategories] = useState(null);
   const navigate = useNavigate();
   const api = useApi();
 
@@ -50,7 +51,7 @@ export default function Courses() {
       if (error.response.status === 401) {
         Swal.fire({
           title: 'Oops...',
-          text: "Your session expired, login again to access!",
+          text: "Sua sessão expirou, faça login novamente para acessar!",
           icon: 'error',
           confirmButtonColor: '#3085d6',
           confirmButtonText: 'Ok'
@@ -108,14 +109,13 @@ export default function Courses() {
     };
   });
 
-  console.log(data);
-
-  const disciplinesReader = data.map((course) => {
+  const disciplinesReader = data?.map((course) => {
     return (
       <Accordion
         key={course.term}
         expanded={expanded === `panel${course.term}`}
         onChange={handleChange(`panel${course.term}`)}
+        sx={{ display: course.disciplines.length === 0 && "none" }}
       >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
@@ -177,18 +177,18 @@ export default function Courses() {
         </AccordionDetails>
       </Accordion>
     );
-  })
+  });
 
   return (
     <Container>
       <Content>
         <NavSection>
           <CustomizedLink to='/courses'>
-            <Button variant="outlined">DISCIPLINAS</Button>
+            <Button variant="contained">DISCIPLINAS</Button>
           </CustomizedLink>
 
           <CustomizedLink to='/instructors'>
-            <Button variant="contained">PESSOA INSTRUTORA</Button>
+            <Button variant="outlined">PESSOA INSTRUTORA</Button>
           </CustomizedLink>
 
           <Button variant="outlined">ADICIONAR</Button>
@@ -201,7 +201,3 @@ export default function Courses() {
     </Container>
   );
 }
-
-const CustomizedP = styled.p`
-  display: ${(props) => props.displayP === 0 && 'none'}
-`;
