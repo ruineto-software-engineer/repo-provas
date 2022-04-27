@@ -49,7 +49,62 @@ const CustomizedLink = styled(Link)`
 `;
 
 const CustomizedP = styled.p`
-  display: ${(props) => props.displayP === 0 && 'none'};
+  display: ${(props) => props.displayP === 0 && 'none' };
+
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: 0.15px;
+
+  width: 100%;
+
+  padding: 0 10px;
+
+  color: #000000;
+`;
+
+const CustomizedA = styled.a`
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: 0.15px;
+  text-decoration: none;
+
+  color: #878787;
+
+  :hover{
+    text-decoration: underline;
+  }
+`;
+
+const Views = styled.span`
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: 0.15px;
+
+  color: #878787;
+`;
+
+const TestContainer = styled.span`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+
+  @media screen and (max-width: 650px){
+    flex-direction: column;
+    align-items: flex-start;
+
+    margin-bottom: 20px;
+  }
 `;
 
 export {
@@ -58,6 +113,9 @@ export {
   NavSection,
   CustomizedLink,
   AcordeonContainer,
-  CustomizedP
+  CustomizedP,
+  CustomizedA,
+  Views,
+  TestContainer
 }
 

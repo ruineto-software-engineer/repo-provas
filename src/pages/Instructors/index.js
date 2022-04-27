@@ -17,15 +17,20 @@ import {
   NavSection,
   CustomizedLink,
   AcordeonContainer,
-  CustomizedP
+  CustomizedP,
+  CustomizedA,
+  Views,
+  TestContainer
 } from "./style";
 
 export default function Instructors() {
   const [categories, setCategories] = useState(null);
+  const [reload, setReload] = useState(false);
   const { auth, logout } = useAuth();
   const { instructors, setInstructors } = useInstructors();
   const navigate = useNavigate();
   const api = useApi();
+  const headers = { headers: { Authorization: `Bearer ${auth?.token}` } };
 
   const [expanded, setExpanded] = useState(false);
   const handleChange = (panel) => (event, isExpanded) => {
@@ -36,11 +41,9 @@ export default function Instructors() {
     handleInstructors();
 
     // eslint-disable-next-line
-  }, []);
+  }, [reload]);
 
   async function handleInstructors() {
-    const headers = { headers: { Authorization: `Bearer ${auth?.token}` } };
-
     try {
       const instructorsPromise = await api.instructors.getInstructors(headers);
       setInstructors(instructorsPromise.data);
@@ -62,7 +65,30 @@ export default function Instructors() {
         })
       } else {
         fireAlert(error.response.data);
-        navigate("/");
+      }
+    }
+  }
+
+  async function handleUpdateViews(testId) {
+    try {
+      await api.instructors.updateTestViewsById(testId, headers);
+
+      setReload(!reload);
+    } catch (error) {
+      if (error.response?.status === 401) {
+        Swal.fire({
+          title: 'Oops...',
+          text: "Sua sessão expirou, faça login novamente para acessar!",
+          icon: 'error',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'Ok'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            handleLogout(auth.userId);
+          }
+        })
+      } else {
+        fireAlert(error.response.data);
       }
     }
   }
@@ -120,7 +146,13 @@ export default function Instructors() {
             {instructor.instructorName}
           </Typography>
         </AccordionSummary>
-        <AccordionDetails>
+        <AccordionDetails sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          gap: '10px'
+        }}>
           {instructor.categories.map((category) => {
             const displayP = category.tests.filter((test) => (
               test.teacherTests.length > 0
@@ -138,15 +170,20 @@ export default function Instructors() {
                   test.teacherTests.map((teacherTest) => {
                     return (
                       <Fragment key={teacherTest.categoryId}>
-                        <span>
-                          <a
+                        <TestContainer>
+                          <CustomizedA
                             target="_blank"
                             rel="noopener noreferrer"
                             href={teacherTest.pdfUrl}
+                            onClick={() => handleUpdateViews(teacherTest.id)}
                           >
                             {`${teacherTest.name} (${teacherTest.disciplineName})`}
-                          </a>
-                        </span><br />
+                          </CustomizedA>
+
+                          <Views>
+                            {`visualizações: ${teacherTest.views}`}
+                          </Views>
+                        </TestContainer>
                       </Fragment>
                     );
                   })
@@ -158,6 +195,8 @@ export default function Instructors() {
       </Accordion >
     );
   });
+
+  console.log(data);
 
   return (
     <Container>

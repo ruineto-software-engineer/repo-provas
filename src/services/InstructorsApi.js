@@ -12,4 +12,8 @@ export default class InstructorsApi {
   getInstructorsByName(instructorName, headers){
     return api.get(`/instructors/${instructorName}`, headers);
   }
+
+  updateTestViewsById(testId, headers){
+    return api.put(`/instructors/tests/${testId}`, {}, headers);
+  }
 }

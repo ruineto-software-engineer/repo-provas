@@ -17,15 +17,20 @@ import {
   NavSection,
   CustomizedLink,
   AcordeonContainer,
-  CustomizedP
+  CustomizedP,
+  CustomizedA,
+  Views,
+  TestContainer
 } from "./style";
 
 export default function Courses() {
+  const [categories, setCategories] = useState(null);
+  const [reload, setReload] = useState(false);
   const { auth, logout } = useAuth();
   const { disciplines, setDisciplines } = useDisciplines();
-  const [categories, setCategories] = useState(null);
   const navigate = useNavigate();
   const api = useApi();
+  const headers = { headers: { Authorization: `Bearer ${auth?.token}` } };
 
   const [expanded, setExpanded] = useState(false);
   const handleChange = (panel) => (event, isExpanded) => {
@@ -36,11 +41,9 @@ export default function Courses() {
     handleDisciplines();
 
     // eslint-disable-next-line
-  }, []);
+  }, [reload]);
 
   async function handleDisciplines() {
-    const headers = { headers: { Authorization: `Bearer ${auth?.token}` } };
-
     try {
       const { data } = await api.courses.getDisciplines(headers);
       setDisciplines(data);
@@ -62,7 +65,30 @@ export default function Courses() {
         })
       } else {
         fireAlert(error.response.data);
-        navigate("/");
+      }
+    }
+  }
+
+  async function handleUpdateViews(testId) {
+    try {
+      await api.courses.updateTestViewsById(testId, headers);
+
+      setReload(!reload);
+    } catch (error) {
+      if (error.response?.status === 401) {
+        Swal.fire({
+          title: 'Oops...',
+          text: "Sua sessão expirou, faça login novamente para acessar!",
+          icon: 'error',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'Ok'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            handleLogout(auth.userId);
+          }
+        })
+      } else {
+        fireAlert(error.response.data);
       }
     }
   }
@@ -137,14 +163,20 @@ export default function Courses() {
                 >
                   <Typography>{discipline.disciplineName}</Typography>
                 </AccordionSummary>
-                <AccordionDetails>
+                <AccordionDetails sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  justifyContent: 'center',
+                  gap: '10px'
+                }}>
                   {discipline.disciplineCategory.map((category) => {
                     const displayP = category.tests.filter((test) => (
                       test.teacherTests.length > 0
                     ));
 
                     return (
-                      <div key={category.categoryName}>
+                      <div style={{ width: '100%' }} key={category.categoryName}>
                         <CustomizedP displayP={displayP.length}>
                           {category.categoryName}
                           <br />
@@ -153,15 +185,20 @@ export default function Courses() {
                             test.teacherTests.map((teacherTest) => {
                               return (
                                 <Fragment key={teacherTest.categoryId}>
-                                  <span>
-                                    <a
+                                  <TestContainer>
+                                    <CustomizedA
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       href={teacherTest.pdfUrl}
+                                      onClick={() => handleUpdateViews(teacherTest.id)}
                                     >
                                       {`${teacherTest.name} (${teacherTest.teacherName})`}
-                                    </a>
-                                  </span><br />
+                                    </CustomizedA>
+
+                                    <Views>
+                                      {`visualizações: ${teacherTest.views}`}
+                                    </Views>
+                                  </TestContainer>
                                 </Fragment>
                               );
                             })
