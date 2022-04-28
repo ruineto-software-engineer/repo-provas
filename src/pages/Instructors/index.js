@@ -169,7 +169,7 @@ export default function Instructors() {
                 {category.tests.map(test => (
                   test.teacherTests.map((teacherTest) => {
                     return (
-                      <Fragment key={teacherTest.categoryId}>
+                      <Fragment key={teacherTest.id}>
                         <TestContainer>
                           <CustomizedA
                             target="_blank"
@@ -196,8 +196,6 @@ export default function Instructors() {
     );
   });
 
-  console.log(data);
-
   return (
     <Container>
       <Content>
@@ -210,7 +208,9 @@ export default function Instructors() {
             <Button variant="contained">PESSOA INSTRUTORA</Button>
           </CustomizedLink>
 
-          <Button variant="outlined">ADICIONAR</Button>
+          <CustomizedLink to='/create'>
+            <Button variant="outlined">ADICIONAR</Button>
+          </CustomizedLink>
         </NavSection>
 
         <AcordeonContainer>

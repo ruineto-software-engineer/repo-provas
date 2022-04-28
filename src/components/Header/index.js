@@ -158,11 +158,11 @@ export default function Header() {
   return (
     <Container pathname={location.pathname}>
       <ActionContainer>
-        <LogoContainer>
+        <LogoContainer onClick={() => navigate("/courses")}>
           <img alt="logo.svg" src={Logo} />
         </LogoContainer>
 
-        <LogoutContainer onClick={() => handleLogout(auth.userId)}>
+        <LogoutContainer onClick={() => handleLogout(auth?.userId)}>
           <img alt="logout.svg" src={Logout} />
         </LogoutContainer>
       </ActionContainer>

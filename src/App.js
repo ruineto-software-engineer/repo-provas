@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, DisciplinesProvider, InstructorsProvider } from "./contexts";
-import { Login, Register, Courses, Instructors } from "./pages";
+import { Login, Register, Courses, Instructors, Create } from "./pages";
 import Header from "./components/Header";
 
 export default function App() {
@@ -15,6 +15,7 @@ export default function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/courses" element={<Courses />} />
               <Route path="/instructors" element={<Instructors />} />
+              <Route path="/create" element={<Create />} />
             </Routes>
           </BrowserRouter>
         </InstructorsProvider>

@@ -49,7 +49,6 @@ export default function Login() {
 
     try {
       const { data } = await api.auth.login({ email, password: values.password });
-      console.log(data);
 
       fireToast('success', 'Login realizado com sucesso!');
       login(data);

@@ -15,7 +15,7 @@ const Container = styled.header`
   left: 0;
 
   background-color: #FFFFFF;
-  z-index: 1;
+  z-index: 2;
 
   border-bottom: 1px solid #C4C4C4;
 `;
@@ -31,6 +31,8 @@ const ActionContainer = styled.div`
 `;
 
 const LogoContainer = styled.div`
+  cursor: pointer;
+
   img{
     width: 200px;
   }
