@@ -175,7 +175,7 @@ export default function Login() {
                 {'Não possuo cadastro'}
               </CustomizedLink>
 
-              <Button type="submit" variant="contained">ENTRAR</Button>
+              <Button id="submit" type="submit" variant="contained">ENTRAR</Button>
             </FormFooter>
           </Form>
         </div>

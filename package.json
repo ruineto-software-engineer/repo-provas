@@ -38,5 +38,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^6.2.0",
+    "cypress": "^9.6.0",
+    "eslint-plugin-cypress": "^2.12.1"
   }
 }
