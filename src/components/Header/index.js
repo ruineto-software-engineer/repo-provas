@@ -5,9 +5,12 @@ import useAuth from "../../hooks/useAuth";
 import useApi from "../../hooks/useApi";
 import useDisciplines from '../../hooks/useDisciplines';
 import useInstructors from '../../hooks/useInstructors';
+import useInstructorsInputValue from '../../hooks/useInstructorsInputValue';
+import useTermsInputValue from '../../hooks/useTermsInputValue';
 import Logo from "../../assets/img/logo.svg";
 import Logout from "../../assets/icons/logout.svg";
 import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 import {
   Container,
   ActionContainer,
@@ -20,8 +23,14 @@ import {
 import { useEffect, useState } from 'react';
 
 export default function Header() {
-  const [termsInputValue, setTermsInputValue] = useState('');
-  const [instructorsInputValue, setInstructorsInputValue] = useState('');
+  const { termsInputValue, setTermsInputValue } = useTermsInputValue();
+  const [allDisciplines, setAllDisciplines] = useState(null);
+  const [allDisciplineInputValue, setAllDisciplineInputValue] = useState("");
+
+  const { instructorsInputValue, setInstructorsInputValue } = useInstructorsInputValue();
+  const [allInstructors, setAllInstructors] = useState(null);
+  const [allInstructorsInputValue, setAllInstructorsInputValue] = useState("");
+
   const { auth, logout } = useAuth();
   const { setDisciplines } = useDisciplines();
   const { setInstructors } = useInstructors();
@@ -31,9 +40,21 @@ export default function Header() {
   const headers = { headers: { Authorization: `Bearer ${auth?.token}` } };
 
   useEffect(() => {
+    if (auth?.token) {
+      handleFilterDisciplines();
+      handleFilterInstructors();
+    }
+  }, [termsInputValue, instructorsInputValue]);
+
+  useEffect(() => {
     setTermsInputValue('');
     setInstructorsInputValue('');
-  }, [location.pathname])
+
+    if (auth?.token) {
+      handleDisciplines();
+      handleInstructors();
+    }
+  }, [location.pathname]);
 
   async function handleLogout(userId) {
     try {
@@ -47,113 +68,129 @@ export default function Header() {
     }
   }
 
-  const handleTermsKeyDown = async (event) => {
-    if (event.key === 'Enter') {
-      try {
-        const { data } = await api.courses.getDisciplinesByName(termsInputValue, headers);
-
-        setDisciplines(data);
-      } catch (error) {
-        if (error.response.status === 401) {
-          Swal.fire({
-            title: 'Oops...',
-            text: "Sua sessão expirou, faça login novamente para acessar!",
-            icon: 'error',
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'Ok'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              handleLogout(auth.userId);
-            }
-          })
-        } else {
-          fireAlert(error.response.data);
-          navigate("/");
-        }
+  async function handleFilterDisciplines() {
+    try {
+      let promise;
+      if (!termsInputValue) {
+        promise = await api.courses.getDisciplines(headers);
+      } else {
+        promise = await api.courses.getDisciplinesByName(termsInputValue.label, headers);
       }
-    }
 
-    if (event.key === 'Escape') {
-      setTermsInputValue('');
-
-      try {
-        const { data } = await api.courses.getDisciplines(headers);
-
-        setDisciplines(data);
-      } catch (error) {
-        if (error.response.status === 401) {
-          Swal.fire({
-            title: 'Oops...',
-            text: "Sua sessão expirou, faça login novamente para acessar!",
-            icon: 'error',
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'Ok'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              handleLogout(auth.userId);
-            }
-          })
-        } else {
-          fireAlert(error.response.data);
-          navigate("/");
-        }
+      setDisciplines(promise.data);
+    } catch (error) {
+      if (error.response.status === 401) {
+        Swal.fire({
+          title: 'Oops...',
+          text: "Sua sessão expirou, faça login novamente para acessar!",
+          icon: 'error',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'Ok'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            handleLogout(auth.userId);
+          }
+        })
+      } else {
+        fireAlert(error.response.data);
+        navigate("/");
       }
     }
   }
 
-  const handleInstructorsKeyDown = async (event) => {
-    if (event.key === 'Enter') {
-      try {
-        const { data } = await api.instructors.getInstructorsByName(instructorsInputValue, headers);
-
-        setInstructors(data);
-      } catch (error) {
-        if (error.response.status === 401) {
-          Swal.fire({
-            title: 'Oops...',
-            text: "Sua sessão expirou, faça login novamente para acessar!",
-            icon: 'error',
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'Ok'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              handleLogout(auth.userId);
-            }
-          })
-        } else {
-          fireAlert(error.response.data);
-          navigate("/");
-        }
+  async function handleFilterInstructors() {
+    try {
+      let promise;
+      if (!instructorsInputValue) {
+        promise = await api.instructors.getInstructors(headers);
+      } else {
+        promise = await api.instructors.getInstructorsByName(instructorsInputValue.label, headers);
       }
-    }
 
-    if (event.key === 'Escape') {
-      setInstructorsInputValue('');
-
-      try {
-        const { data } = await api.instructors.getInstructors(headers);
-
-        setInstructors(data);
-      } catch (error) {
-        if (error.response.status === 401) {
-          Swal.fire({
-            title: 'Oops...',
-            text: "Sua sessão expirou, faça login novamente para acessar!",
-            icon: 'error',
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'Ok'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              handleLogout(auth.userId);
-            }
-          })
-        } else {
-          fireAlert(error.response.data);
-          navigate("/");
-        }
+      setInstructors(promise.data);
+    } catch (error) {
+      if (error.response.status === 401) {
+        Swal.fire({
+          title: 'Oops...',
+          text: "Sua sessão expirou, faça login novamente para acessar!",
+          icon: 'error',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'Ok'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            handleLogout(auth.userId);
+          }
+        })
+      } else {
+        fireAlert(error.response.data);
+        navigate("/");
       }
     }
   }
+
+  async function handleDisciplines() {
+    try {
+      const { data } = await api.instructors.getDisciplines(headers);
+
+      setAllDisciplines(data);
+    } catch (error) {
+      if (error.response.status === 401) {
+        Swal.fire({
+          title: 'Oops...',
+          text: "Sua sessão expirou, faça login novamente para acessar!",
+          icon: 'error',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'Ok'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            handleLogout(auth.userId);
+          }
+        })
+      } else {
+        fireAlert(error.response.data);
+      }
+    }
+  }
+
+  async function handleInstructors() {
+    try {
+      const { data } = await api.instructors.getInstructors(headers);
+
+      setAllInstructors(data);
+    } catch (error) {
+      if (error.response.status === 401) {
+        Swal.fire({
+          title: 'Oops...',
+          text: "Sua sessão expirou, faça login novamente para acessar!",
+          icon: 'error',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'Ok'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            handleLogout(auth.userId);
+          }
+        })
+      } else {
+        fireAlert(error.response.data);
+      }
+    }
+  }
+
+  const allDisciplinesOptions = allDisciplines?.map((discipline) => {
+    return {
+      id: discipline.id,
+      label: discipline.name
+    };
+  });
+
+  const allInstructorsOptions = allInstructors?.map((instructor) => {
+    return {
+      id: instructor.id,
+      label: instructor.name
+    };
+  });
+
+  if (!allDisciplines || !allInstructors) return " ";
 
   return (
     <Container pathname={location.pathname}>
@@ -170,26 +207,39 @@ export default function Header() {
       <TextFieldContainer>
         <TextFieldContent>
           {location.pathname === '/courses' ?
-            <TextField
-              sx={{ width: '100%' }}
-              id="outlined-basic-header-courses"
-              label="Pesquise por disciplina"
-              variant="outlined"
+            <Autocomplete
+              fullWidth
               value={termsInputValue}
-              onChange={(e) => setTermsInputValue(e.target.value)}
-              onKeyDown={handleTermsKeyDown}
+              onChange={(event, newValue) => {
+                setTermsInputValue(newValue);
+              }}
+              inputValue={allDisciplineInputValue}
+              onInputChange={(event, newInputValue) => {
+                setAllDisciplineInputValue(newInputValue);
+                handleFilterDisciplines();
+              }}
+              id="controllable-states-terms"
+              options={allDisciplinesOptions}
+              isOptionEqualToValue={(termsInputValue) => { return ({ id: termsInputValue.id, label: termsInputValue.name }) }}
+              renderInput={(params) => <TextField {...params} label="Pesquise por disciplina" />}
             />
             :
-              location.pathname === '/instructors' ?
-                <TextField
-                  sx={{ width: '100%' }}
-                  id="outlined-basic-header-instructors"
-                  label="Pesquise por pessoa instrutora"
-                  variant="outlined"
-                  value={instructorsInputValue}
-                  onChange={(e) => setInstructorsInputValue(e.target.value)}
-                  onKeyDown={handleInstructorsKeyDown}
-                />
+            location.pathname === '/instructors' ?
+              <Autocomplete
+                fullWidth
+                value={instructorsInputValue}
+                onChange={(event, newValue) => {
+                  setInstructorsInputValue(newValue);
+                }}
+                inputValue={allInstructorsInputValue}
+                onInputChange={(event, newInputValue) => {
+                  setAllInstructorsInputValue(newInputValue);
+                }}
+                id="controllable-states-instructors"
+                options={allInstructorsOptions}
+                isOptionEqualToValue={(termsInputValue) => { return ({ id: termsInputValue.id, label: termsInputValue.name }) }}
+                renderInput={(params) => <TextField {...params} label="Pesquise por pessoa instrutora" />}
+              />
               :
               <TitleTestPage>Adicione uma prova</TitleTestPage>
           }

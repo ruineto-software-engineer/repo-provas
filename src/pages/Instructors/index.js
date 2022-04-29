@@ -4,6 +4,7 @@ import { fireAlert } from "../../utils/alerts";
 import useAuth from "../../hooks/useAuth";
 import useApi from "../../hooks/useApi";
 import useInstructors from "../../hooks/useInstructors";
+import useInstructorsInputValue from "../../hooks/useInstructorsInputValue";
 import Button from '@mui/material/Button';
 import Swal from "sweetalert2";
 import Accordion from '@mui/material/Accordion';
@@ -28,6 +29,7 @@ export default function Instructors() {
   const [reload, setReload] = useState(false);
   const { auth, logout } = useAuth();
   const { instructors, setInstructors } = useInstructors();
+  const { instructorsInputValue } = useInstructorsInputValue();
   const navigate = useNavigate();
   const api = useApi();
   const headers = { headers: { Authorization: `Bearer ${auth?.token}` } };
@@ -38,7 +40,9 @@ export default function Instructors() {
   };
 
   useEffect(() => {
-    handleInstructors();
+    if (!instructorsInputValue) {
+      handleInstructors();
+    }
 
     // eslint-disable-next-line
   }, [reload]);
@@ -74,6 +78,12 @@ export default function Instructors() {
       await api.instructors.updateTestViewsById(testId, headers);
 
       setReload(!reload);
+
+      if (instructorsInputValue) {
+        const { data } = await api.instructors.getInstructorsByName(instructorsInputValue.label, headers);
+      
+        setInstructors(data);
+      }
     } catch (error) {
       if (error.response?.status === 401) {
         Swal.fire({

@@ -4,6 +4,7 @@ import { fireAlert } from "../../utils/alerts";
 import useAuth from "../../hooks/useAuth";
 import useApi from "../../hooks/useApi";
 import useDisciplines from "../../hooks/useDisciplines";
+import useTermsInputValue from "../../hooks/useTermsInputValue";
 import Button from '@mui/material/Button';
 import Swal from "sweetalert2";
 import Accordion from '@mui/material/Accordion';
@@ -28,6 +29,7 @@ export default function Courses() {
   const [reload, setReload] = useState(false);
   const { auth, logout } = useAuth();
   const { disciplines, setDisciplines } = useDisciplines();
+  const { termsInputValue } = useTermsInputValue();
   const navigate = useNavigate();
   const api = useApi();
   const headers = { headers: { Authorization: `Bearer ${auth?.token}` } };
@@ -38,7 +40,9 @@ export default function Courses() {
   };
 
   useEffect(() => {
-    handleDisciplines();
+    if (!termsInputValue) {
+      handleDisciplines();
+    }
 
     // eslint-disable-next-line
   }, [reload]);
@@ -72,6 +76,12 @@ export default function Courses() {
   async function handleUpdateViews(testId) {
     try {
       await api.courses.updateTestViewsById(testId, headers);
+
+      if (termsInputValue) {
+        const { data } = await api.courses.getDisciplinesByName(termsInputValue.label, headers);
+
+        setDisciplines(data);
+      }
 
       setReload(!reload);
     } catch (error) {
