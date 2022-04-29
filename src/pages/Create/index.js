@@ -6,6 +6,7 @@ import useApi from "../../hooks/useApi";
 import Button from '@mui/material/Button';
 import Swal from "sweetalert2";
 import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -21,12 +22,19 @@ import {
 export default function Create() {
   const [titleTest, setTitleTest] = useState('');
   const [pdfUrl, setPdfUrl] = useState('');
-  const [category, setCategory] = useState('');
+
+  const [category, setCategory] = useState(null);
   const [categories, setCategories] = useState(null);
-  const [discipline, setDiscipline] = useState('');
+  const [categoryInputValue, setCategoryInputValue] = useState('');
+
+  const [discipline, setDiscipline] = useState(null);
   const [disciplines, setDisciplines] = useState(null);
-  const [instructor, setInstructor] = useState('');
+  const [disciplineInputValue, setDisciplineInputValue] = useState('');
+
+  const [instructor, setInstructor] = useState(null);
   const [instructors, setInstructors] = useState(null);
+  const [instructorInputValue, setInstructorInputValue] = useState('');
+
   const navigate = useNavigate();
   const { auth, logout } = useAuth();
   const api = useApi();
@@ -50,21 +58,20 @@ export default function Create() {
     const testData = {
       name: titleTest,
       pdfUrl: pdfUrl,
-      categoryId: category,
+      categoryId: category.id,
       views: 0,
-      disciplineId: discipline,
-      teacherId: instructor
+      disciplineId: discipline.id,
+      teacherId: instructor.id
     }
 
-    console.log(testData);
     try {
       await api.instructors.createTestByInstructor(testData, headers);
 
       setTitleTest('');
       setPdfUrl('');
-      setCategory('');
-      setDiscipline('');
-      setInstructor('');
+      setCategory(null);
+      setDiscipline(null);
+      setInstructor(null);
 
       fireToast('success', 'Prova cadastrada com sucesso!');
     } catch (error) {
@@ -136,9 +143,20 @@ export default function Create() {
 
   async function handleInstructors() {
     try {
-      const { data } = await api.instructors.getInstructorsByDiscipline(discipline, headers);
+      let promise;
+      if (discipline !== null) {
+        promise = await api.instructors.getInstructorsByDiscipline(
+          discipline.id,
+          headers
+        );
+      } else {
+        promise = await api.instructors.getInstructorsByDiscipline(
+          "",
+          headers
+        );
+      }
 
-      setInstructors(data);
+      setInstructors(promise.data);
     } catch (error) {
       if (error.response.status === 401) {
         Swal.fire({
@@ -170,25 +188,26 @@ export default function Create() {
     }
   }
 
-  const categoriesReader = categories?.map((category) => {
-    return (
-      <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>
-    );
+  const categoriesOptions = categories?.map((category) => {
+    return {
+      id: category.id,
+      label: category.name
+    };
   });
 
-  const disciplinesReader = disciplines?.map((discipline) => {
-    return (
-      <MenuItem key={discipline.id} value={discipline.id}>{discipline.name}</MenuItem>
-    );
+  const disciplinesOptions = disciplines?.map((discipline) => {
+    return {
+      id: discipline.id,
+      label: discipline.name
+    };
   });
 
   const instructorConstructor = instructors?.filter(instructor => instructor.teachersDisciplines?.length > 0);
-  const instructorsReader = instructorConstructor?.map((instructor) => {
-    return (
-      <MenuItem key={instructor.id} value={instructor.id}>
-        {instructor.name}
-      </MenuItem>
-    );
+  const instructorsOptions = instructorConstructor?.map((instructor) => {
+    return {
+      id: instructor.id,
+      label: instructor.name
+    };
   });
 
   if (!categories || !disciplines || !instructors) return "Carregando...";
@@ -229,52 +248,53 @@ export default function Create() {
             value={pdfUrl}
             onChange={(e) => setPdfUrl(e.target.value)}
           />
-          <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label">Categoria</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={category}
-              label="Categoria"
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              {categoriesReader}
-            </Select>
-          </FormControl>
-          <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label">Disciplina</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={discipline}
-              label="Disciplina"
-              onChange={(e) => setDiscipline(e.target.value)}
-              onClick={handleInstructors}
-            >
-              {disciplinesReader}
-            </Select>
-          </FormControl>
-          <FormControl
+          <Autocomplete
+            fullWidth
+            value={category}
+            onChange={(event, newValue) => {
+              setCategory(newValue);
+            }}
+            inputValue={categoryInputValue}
+            onInputChange={(event, newInputValue) => {
+              setCategoryInputValue(newInputValue);
+            }}
+            id="controllable-states-categories"
+            options={categoriesOptions}
+            isOptionEqualToValue={(category) => { return ({ id: category.id, label: category.name }) }}
+            renderInput={(params) => <TextField {...params} label="Categoria" />}
+          />
+          <Autocomplete
+            fullWidth
+            value={discipline}
+            onChange={(event, newValue) => {
+              setDiscipline(newValue);
+            }}
+            inputValue={disciplineInputValue}
+            onInputChange={(event, newInputValue) => {
+              setDisciplineInputValue(newInputValue);
+              handleInstructors();
+            }}
+            id="controllable-states-disciplines"
+            options={disciplinesOptions}
+            isOptionEqualToValue={(discipline) => { return ({ id: discipline.id, label: discipline.name }) }}
+            renderInput={(params) => <TextField {...params} label="Disciplina" />}
+          />          
+          <Autocomplete
             fullWidth
             sx={{ pointerEvents: !discipline && 'none' }}
-          >
-            <InputLabel id="demo-simple-select-label">Pessoa Instrutora</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={instructor}
-              label="Pessoa Instrutora"
-              onChange={(e) => setInstructor(e.target.value)}
-            >
-              {instructorsReader?.length === 0 ?
-                <MenuItem value={-1} sx={{ pointerEvents: 'none' }}>
-                  Não existem instrutores cadastrados para esta disciplina
-                </MenuItem>
-                :
-                instructorsReader
-              }
-            </Select>
-          </FormControl>
+            value={instructor}
+            onChange={(event, newValue) => {
+              setInstructor(newValue);
+            }}
+            inputValue={instructorInputValue}
+            onInputChange={(event, newInputValue) => {
+              setInstructorInputValue(newInputValue);
+            }}
+            id="controllable-states-instructors"
+            options={instructorsOptions}
+            isOptionEqualToValue={(instructor) => { return ({ id: instructor.id, label: instructor.name }) }}
+            renderInput={(params) => <TextField {...params} label="Pessoa Instrutora" />}
+          />
 
           <Button
             fullWidth
