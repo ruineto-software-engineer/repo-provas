@@ -34,6 +34,9 @@ export default function Header() {
   const { auth, logout } = useAuth();
   const { setDisciplines } = useDisciplines();
   const { setInstructors } = useInstructors();
+
+  const [session, setSession] = useState(true);
+
   const navigate = useNavigate();
   const location = useLocation();
   const api = useApi();
@@ -41,8 +44,10 @@ export default function Header() {
 
   useEffect(() => {
     if (auth?.token) {
-      handleFilterDisciplines();
-      handleFilterInstructors();
+      if (session) {
+        handleFilterDisciplines();
+        handleFilterInstructors();
+      }
     }
   }, [termsInputValue, instructorsInputValue]);
 
@@ -51,12 +56,16 @@ export default function Header() {
     setInstructorsInputValue('');
 
     if (auth?.token) {
-      handleDisciplines();
-      handleInstructors();
+      if (session) {
+        handleDisciplines();
+        handleInstructors();
+      }
     }
   }, [location.pathname]);
 
   async function handleLogout(userId) {
+    setSession(false);
+
     try {
       await api.auth.logout(userId);
 
