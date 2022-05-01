@@ -42,7 +42,7 @@ const LogoutContainer = styled.div`
   cursor: pointer;
 
   img{
-    width: 30px;
+    width: 25px;
   }
 `;
 
