@@ -89,6 +89,7 @@ export default function Header() {
       setDisciplines(promise.data);
     } catch (error) {
       if (error.response.status === 401) {
+        setSession(false);
         Swal.fire({
           title: 'Oops...',
           text: "Sua sessão expirou, faça login novamente para acessar!",
@@ -119,6 +120,7 @@ export default function Header() {
       setInstructors(promise.data);
     } catch (error) {
       if (error.response.status === 401) {
+        setSession(false);
         Swal.fire({
           title: 'Oops...',
           text: "Sua sessão expirou, faça login novamente para acessar!",
@@ -144,6 +146,7 @@ export default function Header() {
       setAllDisciplines(data);
     } catch (error) {
       if (error.response.status === 401) {
+        setSession(false);
         Swal.fire({
           title: 'Oops...',
           text: "Sua sessão expirou, faça login novamente para acessar!",
@@ -168,6 +171,7 @@ export default function Header() {
       setAllInstructors(data);
     } catch (error) {
       if (error.response.status === 401) {
+        setSession(false);
         Swal.fire({
           title: 'Oops...',
           text: "Sua sessão expirou, faça login novamente para acessar!",
@@ -243,6 +247,7 @@ export default function Header() {
                 inputValue={allInstructorsInputValue}
                 onInputChange={(event, newInputValue) => {
                   setAllInstructorsInputValue(newInputValue);
+                  handleFilterInstructors();
                 }}
                 id="controllable-states-instructors"
                 options={allInstructorsOptions}
