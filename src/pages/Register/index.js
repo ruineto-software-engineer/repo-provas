@@ -65,6 +65,13 @@ export default function Register() {
     }
   }
 
+  function handleGitHubOAuth() {
+    const CLIENT_ID = '49c1e1c6471b3eb9af6d';
+    const OAUTH_GITHUB_BASE_URL = 'https://github.com/login/oauth/authorize';
+
+    window.location.replace(`${OAUTH_GITHUB_BASE_URL}?client_id=${CLIENT_ID}`);
+  }
+
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
   };
@@ -145,7 +152,11 @@ export default function Register() {
         <div>
           <TitlePage>Cadastro</TitlePage>
 
-          <CustomizedButton sx={{ width: '100%' }} variant="contained">
+          <CustomizedButton
+            sx={{ width: '100%' }}
+            variant="contained"
+            onClick={handleGitHubOAuth}
+          >
             ENTRAR COM O GITHUB
           </CustomizedButton>
 

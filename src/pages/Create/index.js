@@ -255,7 +255,7 @@ export default function Create() {
             id="outlined-basic"
             label="PDF da prova"
             variant="outlined"
-            type={'text'}
+            type={'file'}
             value={pdfUrl}
             onChange={(e) => setPdfUrl(e.target.value)}
             required
