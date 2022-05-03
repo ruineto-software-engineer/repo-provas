@@ -28,4 +28,8 @@ export default class InstructorsApi {
   createTestByInstructor(testData, headers){
     return api.post('/instructors/tests/create', testData, headers);
   }
+
+  createTestByInstructorFormData(formData, headers){
+    return api.post('/instructors/tests/create/formData', formData, headers);
+  }
 }

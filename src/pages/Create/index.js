@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { fireAlert, fireToast } from '../../utils/alerts';
+import { styled } from '@mui/material/styles';
 import useAuth from "../../hooks/useAuth";
 import useApi from "../../hooks/useApi";
 import Button from '@mui/material/Button';
 import Swal from "sweetalert2";
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
+import supabase from '../../supabaseClient';
 import {
   Container,
   Content,
@@ -15,9 +18,13 @@ import {
   FormContainer
 } from "./style";
 
+const Input = styled('input')({
+  display: 'none',
+});
+
 export default function Create() {
   const [titleTest, setTitleTest] = useState('');
-  const [pdfUrl, setPdfUrl] = useState('');
+  const [pdf, setPdf] = useState('');
 
   const [category, setCategory] = useState(null);
   const [categories, setCategories] = useState(null);
@@ -31,6 +38,7 @@ export default function Create() {
   const [instructors, setInstructors] = useState(null);
   const [instructorInputValue, setInstructorInputValue] = useState('');
 
+  const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
   const { auth, logout } = useAuth();
   const api = useApi();
@@ -52,27 +60,52 @@ export default function Create() {
     // eslint-disable-next-line
   }, [discipline]);
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+  async function onSubmit({ file }) {
+    const formData = new FormData();
 
-    if (!titleTest || !pdfUrl || !category || !discipline || !instructor) {
+    if (!titleTest || !category || !discipline || !instructor) {
       return fireAlert("Existem campos vazios! Reveja e tente novamente!");
     }
 
+    console.log("file: ", file);
+
+    formData.append("file", file[0]);
+
+    console.log("formInfo: ", formData);
+
     const testData = {
       name: titleTest,
-      pdfUrl: pdfUrl,
+      pdf: pdf,
       categoryId: category.id,
       views: 0,
       disciplineId: discipline.id,
       teacherId: instructor.id
     }
 
+    formData.append("testData", JSON.stringify(testData));
+
+    console.log(testData);
+
     try {
-      await api.instructors.createTestByInstructor(testData, headers);
+      supabase.auth.signIn({ email: 'ruineto11@gmail.com' });
+
+      /* await api.instructors.createTestByInstructor(testData, headers); */
+      /* await api.instructors.createTestByInstructorFormData(formData, headers); */
+
+      const pdfFile = file;
+      const { data, error } = await supabase
+        .storage
+        .from('uploads')
+        .upload(`public/${file['0'].name}`, pdfFile, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      console.log("data: ", data);
+      console.log("error: ", error);
 
       setTitleTest('');
-      setPdfUrl('');
+      setPdf('');
       setCategory(null);
       setDiscipline(null);
       setInstructor(null);
@@ -239,7 +272,10 @@ export default function Create() {
           </CustomizedLink>
         </NavSection>
 
-        <FormContainer onSubmit={handleSubmit}>
+        <FormContainer
+          onSubmit={handleSubmit((data) => onSubmit(data))}
+          enctype="multipart/form-data"
+        >
           <TextField
             sx={{ width: '100%' }}
             id="outlined-basic"
@@ -250,14 +286,15 @@ export default function Create() {
             onChange={(e) => setTitleTest(e.target.value)}
             required
           />
-          <TextField
-            sx={{ width: '100%' }}
+          <input
+            {...register("file")}
+            style={{ width: '100%' }}
+            accept=".pdf"
+            name="file"
             id="outlined-basic"
             label="PDF da prova"
             variant="outlined"
             type={'file'}
-            value={pdfUrl}
-            onChange={(e) => setPdfUrl(e.target.value)}
             required
           />
           <Autocomplete
