@@ -160,9 +160,10 @@ export default function Register() {
               type={'email'}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
 
-            <FormControl sx={{ width: '100%' }} variant="outlined">
+            <FormControl sx={{ width: '100%' }} variant="outlined" required>
               <InputLabel htmlFor="outlined-adornment-password">Senha</InputLabel>
               <OutlinedInput
                 id="outlined-adornment-password"
@@ -185,7 +186,7 @@ export default function Register() {
               />
             </FormControl>
 
-            <FormControl sx={{ width: '100%' }} variant="outlined">
+            <FormControl sx={{ width: '100%' }} variant="outlined" required>
               <InputLabel htmlFor="outlined-adornment-confirm-password">Confirme sua senha</InputLabel>
               <OutlinedInput
                 id="outlined-adornment-confirm-password"

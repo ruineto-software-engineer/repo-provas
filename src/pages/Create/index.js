@@ -116,7 +116,7 @@ export default function Create() {
           }
         })
       } else {
-        if(!auth?.token) return fireAlert("Você precisa estar logado para acessar!");
+        if (!auth?.token) return fireAlert("Você precisa estar logado para acessar!");
 
         fireAlert(error.response.data);
       }
@@ -142,7 +142,7 @@ export default function Create() {
           }
         })
       } else {
-        if(!auth?.token) return fireAlert("Você precisa estar logado para acessar!");
+        if (!auth?.token) return fireAlert("Você precisa estar logado para acessar!");
 
         fireAlert(error.response.data);
       }
@@ -179,7 +179,7 @@ export default function Create() {
           }
         })
       } else {
-        if(!auth?.token) return fireAlert("Você precisa estar logado para acessar!");
+        if (!auth?.token) return fireAlert("Você precisa estar logado para acessar!");
 
         fireAlert(error.response.data);
       }
@@ -248,6 +248,7 @@ export default function Create() {
             type={'text'}
             value={titleTest}
             onChange={(e) => setTitleTest(e.target.value)}
+            required
           />
           <TextField
             sx={{ width: '100%' }}
@@ -257,6 +258,7 @@ export default function Create() {
             type={'text'}
             value={pdfUrl}
             onChange={(e) => setPdfUrl(e.target.value)}
+            required
           />
           <Autocomplete
             fullWidth
@@ -271,7 +273,7 @@ export default function Create() {
             id="controllable-states-categories"
             options={categoriesOptions}
             isOptionEqualToValue={(category) => { return ({ id: category.id, label: category.name }) }}
-            renderInput={(params) => <TextField {...params} label="Categoria" />}
+            renderInput={(params) => <TextField {...params} label="Categoria" required />}
           />
           <Autocomplete
             fullWidth
@@ -287,8 +289,8 @@ export default function Create() {
             id="controllable-states-disciplines"
             options={disciplinesOptions}
             isOptionEqualToValue={(discipline) => { return ({ id: discipline.id, label: discipline.name }) }}
-            renderInput={(params) => <TextField {...params} label="Disciplina" />}
-          />          
+            renderInput={(params) => <TextField {...params} label="Disciplina" required />}
+          />
           <Autocomplete
             fullWidth
             sx={{ pointerEvents: !discipline && 'none' }}
@@ -303,7 +305,7 @@ export default function Create() {
             id="controllable-states-instructors"
             options={instructorsOptions}
             isOptionEqualToValue={(instructor) => { return ({ id: instructor.id, label: instructor.name }) }}
-            renderInput={(params) => <TextField {...params} label="Pessoa Instrutora" />}
+            renderInput={(params) => <TextField {...params} label="Pessoa Instrutora" required />}
           />
 
           <Button

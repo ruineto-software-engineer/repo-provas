@@ -159,9 +159,10 @@ export default function Login() {
               type={'email'}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
 
-            <FormControl sx={{ width: '100%' }} variant="outlined">
+            <FormControl sx={{ width: '100%' }} variant="outlined" required>
               <InputLabel htmlFor="outlined-adornment-password">Senha</InputLabel>
               <OutlinedInput
                 id="outlined-adornment-password"
