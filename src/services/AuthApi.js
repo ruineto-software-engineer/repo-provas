@@ -5,6 +5,10 @@ export default class AuthApi {
     return api.post("/login", data);
   }
 
+  loginGitHub(data) {
+    return api.post("/login/oauth/github", data);
+  }
+
   logout(userId){
     return api.delete(`/logout/${userId}`);
   }

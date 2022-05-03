@@ -40,6 +40,14 @@ export default function Courses() {
   };
 
   useEffect(() => {
+    if (!auth?.token) {
+      navigate("/");
+    }
+
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
     if (!termsInputValue) {
       handleDisciplines();
     }
@@ -68,6 +76,8 @@ export default function Courses() {
           }
         })
       } else {
+        if (!auth?.token) return fireAlert("Você precisa estar logado para acessar!");
+
         fireAlert(error.response.data);
       }
     }

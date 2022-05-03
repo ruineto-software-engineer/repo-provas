@@ -71,6 +71,7 @@ export default function Header() {
 
       logout();
       navigate("/");
+      window.location.reload(true);
     } catch (error) {
       fireAlert(error.response.data);
       navigate("/");

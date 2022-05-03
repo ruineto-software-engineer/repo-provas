@@ -37,6 +37,14 @@ export default function Create() {
   const headers = { headers: { Authorization: `Bearer ${auth?.token}` } };
 
   useEffect(() => {
+    if (!auth?.token) {
+      navigate("/");
+    }
+
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
     handleCategories();
     handleDisciplines();
     handleInstructors();
@@ -108,6 +116,8 @@ export default function Create() {
           }
         })
       } else {
+        if(!auth?.token) return fireAlert("Você precisa estar logado para acessar!");
+
         fireAlert(error.response.data);
       }
     }
@@ -132,6 +142,8 @@ export default function Create() {
           }
         })
       } else {
+        if(!auth?.token) return fireAlert("Você precisa estar logado para acessar!");
+
         fireAlert(error.response.data);
       }
     }
@@ -167,6 +179,8 @@ export default function Create() {
           }
         })
       } else {
+        if(!auth?.token) return fireAlert("Você precisa estar logado para acessar!");
+
         fireAlert(error.response.data);
       }
     }

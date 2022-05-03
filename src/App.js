@@ -6,7 +6,7 @@ import {
   TermsInputValueProvider,
   InstructorsInputValueProvider
 } from "./contexts";
-import { Login, Register, Courses, Instructors, Create } from "./pages";
+import { Login, Register, Oauth, Courses, Instructors, Create } from "./pages";
 import Header from "./components/Header";
 
 export default function App() {
@@ -21,6 +21,7 @@ export default function App() {
                 <Routes>
                   <Route path="/" element={<Login />} />
                   <Route path="/register" element={<Register />} />
+                  <Route path="/oauth" element={<Oauth />} />
                   <Route path="/courses" element={<Courses />} />
                   <Route path="/instructors" element={<Instructors />} />
                   <Route path="/create" element={<Create />} />

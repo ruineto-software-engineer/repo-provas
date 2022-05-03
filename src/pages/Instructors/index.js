@@ -40,6 +40,14 @@ export default function Instructors() {
   };
 
   useEffect(() => {
+    if (!auth?.token) {
+      navigate("/");
+    }
+
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
     if (!instructorsInputValue) {
       handleInstructors();
     }
@@ -68,6 +76,8 @@ export default function Instructors() {
           }
         })
       } else {
+        if(!auth?.token) return fireAlert("Você precisa estar logado para acessar!");
+
         fireAlert(error.response.data);
       }
     }

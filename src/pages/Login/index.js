@@ -15,13 +15,13 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button';
 import { styled } from '@mui/system';
-import { 
-  Container, 
-  Content, 
-  Form, 
-  FormFooter, 
-  TitlePage, 
-  LogoContainer 
+import {
+  Container,
+  Content,
+  Form,
+  FormFooter,
+  TitlePage,
+  LogoContainer
 } from '../../components/Form';
 
 export default function Login() {
@@ -48,7 +48,10 @@ export default function Login() {
       return fireAlert("Existem campos vazios! Reveja e tente novamente!");
 
     try {
-      const { data } = await api.auth.login({ email, password: values.password });
+      const { data } = await api.auth.login({ 
+        email, 
+        password: values.password
+      });
 
       fireToast('success', 'Login realizado com sucesso!');
       login(data);
@@ -60,6 +63,13 @@ export default function Login() {
         fireAlert(error.response.data);
       }
     }
+  }
+
+  function handleGitHubOAuth() {
+    const CLIENT_ID = '49c1e1c6471b3eb9af6d';
+    const OAUTH_GITHUB_BASE_URL = 'https://github.com/login/oauth/authorize';
+
+    window.location.replace(`${OAUTH_GITHUB_BASE_URL}?client_id=${CLIENT_ID}`);
   }
 
   const handleChange = (prop) => (event) => {
@@ -130,7 +140,11 @@ export default function Login() {
         <div>
           <TitlePage>Login</TitlePage>
 
-          <CustomizedButton sx={{ width: '100%' }} variant="contained">
+          <CustomizedButton
+            sx={{ width: '100%' }}
+            variant="contained"
+            onClick={handleGitHubOAuth}
+          >
             ENTRAR COM O GITHUB
           </CustomizedButton>
 
